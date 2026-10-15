@@ -1,0 +1,11 @@
+{
+    "max_files": 100,
+    "max_bundle_size_bytes": 5242880,
+    "max_applications": 10,
+    "max_tests": 500,
+    "max_steps_per_test": 100,
+    "max_assertions_per_step": 20,
+    "max_tabs_per_test": 4,
+    "max_dependency_depth": 20,
+    "max_name_length": 255
+}

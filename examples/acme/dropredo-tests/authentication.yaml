@@ -1,0 +1,29 @@
+applications:
+  acme:
+    groups:
+      authentication:
+        description: Sign in and sign out
+        tests:
+          user can sign in with valid credentials:
+            environments: [prod]
+            depends_on: []
+            steps:
+              - step: visit {{ base_uri }}/login
+                assertions:
+                  - the heading "Sign in to Acme" is visible
+              - fill the {{ user_email }} into the email address field
+              - fill the {{ user_password }} into the password field
+              - step: click the button with text "Sign in"
+                assertions:
+                  - the browser is on the dashboard page
+                  - description: an invalid credentials error is shown
+                    negate: true
+
+          user can sign out:
+            environments: [prod]
+            depends_on:
+              - user can sign in with valid credentials
+            steps:
+              - step: click the button with text "Log out"
+                assertions:
+                  - the heading "Sign in to Acme" is visible

@@ -1,0 +1,51 @@
+applications:
+  dropredo-website:
+    groups:
+      content-hub:
+        description: The blog and how-to guide collections, including their dynamic detail pages and 404 handling for unknown slugs.
+        tests:
+          blog index lists articles and links through to an article:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/blog
+                assertions:
+                  - 'the heading "The DropRedo blog" is visible'
+              - step: 'click the "Playwright vs. no-code testing: an honest guide for non-engineers" article'
+                assertions:
+                  - 'the heading "Playwright vs. no-code testing: an honest guide for non-engineers" is visible'
+                  - the URL contains /blog/playwright-vs-no-code-testing
+              - step: click "Back to blog"
+                assertions:
+                  - 'the heading "The DropRedo blog" is visible'
+
+          visiting an unknown blog slug shows a not found error:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/blog/this-slug-does-not-exist
+                assertions:
+                  - description: the page responds with a 404 status
+                    type: status
+                    expected: 404
+
+          how-to index lists guides and links through to a guide:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/how-to
+                assertions:
+                  - the heading "How to test anything, without writing code" is visible
+              - step: click the "How to test a file upload without writing code" guide
+                assertions:
+                  - the heading "How to test a file upload without writing code" is visible
+                  - the URL contains /how-to/test-file-upload-without-code
+              - step: click "All how-to guides"
+                assertions:
+                  - the heading "How to test anything, without writing code" is visible
+
+          visiting an unknown how-to slug shows a not found error:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/how-to/this-guide-does-not-exist
+                assertions:
+                  - description: the page responds with a 404 status
+                    type: status
+                    expected: 404

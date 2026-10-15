@@ -1,0 +1,26 @@
+applications:
+  dropredo-website:
+    groups:
+      comparisons:
+        description: The alternatives hub and the individual competitor comparison pages it links to.
+        tests:
+          alternatives hub links through to a comparison page:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/alternatives
+                assertions:
+                  - 'the heading "DropRedo vs. the alternatives" is visible'
+              - step: click the "DropRedo vs. testRigor" comparison card
+                assertions:
+                  - the heading "DropRedo vs. testRigor" is visible
+                  - the URL contains /testrigor-alternative
+
+          the Cypress comparison page shows the comparison table:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/cypress-alternative
+                assertions:
+                  - the heading "DropRedo vs. Cypress" is visible
+                  - the comparison table shows the column header "Cypress"
+                  - the comparison table shows the row "Authoring model"
+                  - the "Try DropRedo instead of Cypress" call-to-action is visible

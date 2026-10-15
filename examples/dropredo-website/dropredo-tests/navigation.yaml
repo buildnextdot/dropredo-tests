@@ -1,0 +1,94 @@
+applications:
+  dropredo-website:
+    groups:
+      navigation:
+        description: Header and footer chrome — nav links, the logo, legal pages, and external contact/social destinations.
+        tests:
+          header navigation reaches Features, For agencies and Examples:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "Features" in the header navigation
+                assertions:
+                  - the heading "Everything it takes to run real browser tests" is visible
+                  - the URL contains /features
+              - step: navigate back to the previous page
+                action: goBack
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "For agencies" in the header navigation
+                assertions:
+                  - 'the heading "QA for every client site — without a QA hire." is visible'
+                  - the URL contains /for-agencies
+              - step: navigate back to the previous page
+                action: goBack
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "Examples" in the header navigation
+                assertions:
+                  - the heading "Every action and assertion, in plain English" is visible
+                  - the URL contains /examples
+
+          header navigation reaches Pricing and Demo, and the logo returns to the homepage:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "Pricing" in the header navigation
+                assertions:
+                  - 'the heading "Simple pricing, generous free tier" is visible'
+                  - the URL contains /pricing
+              - step: navigate back to the previous page
+                action: goBack
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "Demo" in the header navigation
+                assertions:
+                  - the heading "Video tutorials & product demos" is visible
+                  - the URL contains /demo
+              - step: click the "DropRedo" logo in the header
+                assertions:
+                  - the heading "Your UI changed." is visible
+                  - description: the browser is on the homepage
+                    type: pageHasURL
+                    expected: "{{ base_uri }}/"
+
+          footer legal links lead to the Privacy Policy and Terms of Service pages:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "Privacy Policy" in the footer
+                assertions:
+                  - the heading "Privacy Policy" is visible
+                  - the URL contains /privacy
+              - step: navigate back to the previous page
+                action: goBack
+                assertions:
+                  - the heading "Your UI changed." is visible
+              - step: click "Terms of Service" in the footer
+                assertions:
+                  - the heading "Terms of Service" is visible
+                  - the URL contains /terms
+
+          footer contact and social links point to the right destinations:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}
+                assertions:
+                  - description: 'the footer "hello@dropredo.com" link has the href "mailto:{{ contact_email }}"'
+                    type: elementHasAttribute
+                    attribute: href
+                    expected: "mailto:{{ contact_email }}"
+                  - description: the footer "DropRedo on X" social icon link has the href "https://x.com/dropredo"
+                    type: elementHasAttribute
+                    attribute: href
+                    expected: "https://x.com/dropredo"
+                  - description: the footer "DropRedo on LinkedIn" social icon link has the href "https://www.linkedin.com/company/dropredo"
+                    type: elementHasAttribute
+                    attribute: href
+                    expected: "https://www.linkedin.com/company/dropredo"

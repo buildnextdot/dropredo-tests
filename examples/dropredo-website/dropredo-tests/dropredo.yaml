@@ -1,0 +1,18 @@
+version: 1
+
+applications:
+  dropredo-website:
+    description: >-
+      DropRedo's public marketing and SEO website (Nuxt 3, fully static/prerendered
+      content). It has no authentication, no forms, and no backend of its own — every
+      "Start Free" / "Subscribe" call-to-action links out to the separate DropRedo
+      product app, which lives outside this repository. There is nothing here to sign
+      up, sign in, or create records with, so this suite only covers navigation, page
+      content, and client-side widgets.
+    environments:
+      prod:
+        description: Production site (dropredo.com) — the only deployment target found in the repo.
+        variables:
+          base_uri: "https://dropredo.com"
+          app_url: "https://app.dropredo.com"
+          contact_email: "hello@dropredo.com"

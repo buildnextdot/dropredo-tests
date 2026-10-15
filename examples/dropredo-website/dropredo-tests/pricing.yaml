@@ -1,0 +1,56 @@
+applications:
+  dropredo-website:
+    groups:
+      pricing:
+        description: The pricing page — plan cards, the monthly/yearly billing toggle, CTAs, and the pricing FAQ.
+        tests:
+          pricing page shows monthly prices by default and switches to yearly:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/pricing
+                assertions:
+                  - 'the heading "Simple pricing, generous free tier" is visible'
+                  - the "Starter" plan card shows a price of "₹699"
+              - step: click the "Yearly" billing toggle button
+                assertions:
+                  - the "Starter" plan card shows a price of "₹6,990"
+                  - description: the "Starter" plan card no longer shows the monthly price "₹699"
+                    negate: true
+
+          Free, Starter and Pro plan CTAs all link to the DropRedo app:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/pricing
+                assertions:
+                  - the "Free" plan card has a "Start Free" button
+                  - description: the "Free" plan's "Start Free" button has the href pointing at the DropRedo app
+                    type: elementHasAttribute
+                    attribute: href
+                    expected: "{{ app_url }}"
+                  - the "Pro" plan card shows a "Most Popular" badge
+                  - description: the "Pro" plan's "Subscribe" button has the href pointing at the DropRedo app
+                    type: elementHasAttribute
+                    attribute: href
+                    expected: "{{ app_url }}"
+
+          the pricing table ends with a founder-contact line instead of an enterprise card:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/pricing
+                assertions:
+                  - the text "Need more?" is visible below the plan cards
+                  - the "Email the founder" link points to a mailto address for {{ contact_email }}
+                  - description: an "Enterprise" heading is visible
+                    negate: true
+                  - description: a "Talk to us" button is visible
+                    negate: true
+
+          the pricing FAQ accordion expands to show an answer:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/pricing
+                assertions:
+                  - 'the heading "Pricing FAQ" is visible'
+              - step: click the FAQ question "Can I switch between monthly and yearly billing?"
+                assertions:
+                  - an answer mentioning "two months free" is visible

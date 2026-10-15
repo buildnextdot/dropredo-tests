@@ -1,0 +1,63 @@
+applications:
+  dropredo-website:
+    groups:
+      product-education:
+        description: >-
+          Pages that teach a visitor about the product and its syntax — self-healing
+          explainer, the action/assertion catalog, video demos, and the agencies
+          landing page — plus the interactive widgets on them.
+        tests:
+          examples page toggles between Actions and Assertions tabs:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/examples
+                assertions:
+                  - the heading "Every action and assertion, in plain English" is visible
+                  - the "Actions (28)" tab is visible
+              - step: click the "Assertions (27)" tab
+                assertions:
+                  - assertion example cards are visible
+                  - a note about the Negate toggle is visible
+
+          demo page filters video guides by category:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/demo
+                assertions:
+                  - the heading "Video tutorials & product demos" is visible
+              - step: click the "Writing Tests" category filter
+                assertions:
+                  - the "Writing Your First Test in Plain English" guide is visible
+                  - description: the "Managing Workspace Settings" guide is visible
+                    negate: true
+
+          demo page video plays when clicked:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/demo
+                assertions:
+                  - the heading "Video tutorials & product demos" is visible
+              - step: click the play button on the "Getting Started with DropRedo" video
+                assertions:
+                  - a video player with controls is visible
+
+          self-healing tests FAQ accordion expands to show an answer:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/self-healing-tests
+                assertions:
+                  - 'the heading "Self-healing tests: what it actually means" is visible'
+              - step: click the FAQ question "Does it fix every broken test?"
+                assertions:
+                  - an answer mentioning "Self-healing handles drift, not deletion" is visible
+
+          for-agencies founding offer links to a mailto for the founding offer:
+            environments: [prod]
+            steps:
+              - step: visit {{ base_uri }}/for-agencies
+                assertions:
+                  - 'the heading "QA for every client site — without a QA hire." is visible'
+                  - description: 'the "Claim the founding offer" button has the href "mailto:{{ contact_email }}?subject=Founding%20agency%20offer"'
+                    type: elementHasAttribute
+                    attribute: href
+                    expected: "mailto:{{ contact_email }}?subject=Founding%20agency%20offer"

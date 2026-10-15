@@ -1,0 +1,478 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/buildnextdot/dropredo-tests/main/schema/dropredo-tests.schema.json",
+    "title": "DropRedo test suite file",
+    "description": "One file of a dropredo-tests/ folder: plain-English browser tests that DropRedo runs in real browsers. See PROMPT.md for how to write them.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "version": {
+            "const": 1,
+            "description": "Format version. Only 1 exists."
+        },
+        "applications": {
+            "type": "object",
+            "description": "Application name => definition. A module file repeats only the application name and declares its groups.",
+            "propertyNames": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255
+            },
+            "maxProperties": 10,
+            "additionalProperties": {
+                "$ref": "#/definitions/application"
+            }
+        }
+    },
+    "definitions": {
+        "application": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "environments": {
+                    "type": "object",
+                    "description": "Environment name => definition. Declared once, in dropredo.yaml. The first one is where tests are generated.",
+                    "propertyNames": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/environment"
+                    }
+                },
+                "groups": {
+                    "type": "object",
+                    "description": "Group name => definition. One group per file, never split across files.",
+                    "propertyNames": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/definitions/group"
+                    }
+                }
+            }
+        },
+        "environment": {
+            "type": [
+                "object",
+                "null"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "variables": {
+                    "description": "Variable key => value, used in steps as {{ key }}. A map, or a list of single key: value pairs.",
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "propertyNames": {
+                                "pattern": "^[a-zA-Z0-9_-]+$"
+                            },
+                            "additionalProperties": {
+                                "$ref": "#/definitions/variable"
+                            }
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "minProperties": 1,
+                                "maxProperties": 1,
+                                "propertyNames": {
+                                    "pattern": "^[a-zA-Z0-9_-]+$"
+                                },
+                                "additionalProperties": {
+                                    "$ref": "#/definitions/variable"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "variable": {
+            "description": "A value (a string unless typed), or { value, type }. Never empty: write \"REPLACE_ME\" when unknown.",
+            "oneOf": [
+                {
+                    "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "value"
+                    ],
+                    "properties": {
+                        "value": {
+                            "type": [
+                                "string",
+                                "number",
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "type": {
+                            "enum": [
+                                "string",
+                                "number",
+                                "boolean",
+                                "file",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "group": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "tests"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "tests": {
+                    "type": "object",
+                    "description": "Test name => definition. Test names are unique within an application.",
+                    "propertyNames": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "minProperties": 1,
+                    "additionalProperties": {
+                        "$ref": "#/definitions/test"
+                    }
+                }
+            }
+        },
+        "test": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "environments",
+                "steps"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "environments": {
+                    "description": "The environments this test runs in. The first is where it is generated.",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            }
+                        }
+                    ]
+                },
+                "depends_on": {
+                    "description": "At most one test in the same application, whose browser session this test resumes.",
+                    "oneOf": [
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            },
+                            "maxItems": 1
+                        }
+                    ]
+                },
+                "depends on": {
+                    "description": "At most one test in the same application, whose browser session this test resumes.",
+                    "oneOf": [
+                        {
+                            "type": "null"
+                        },
+                        {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            },
+                            "maxItems": 1
+                        }
+                    ]
+                },
+                "tabs": {
+                    "description": "Named browser tabs. The first is the primary tab: a step with no `tab:` runs there.",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            },
+                            "maxItems": 4
+                        }
+                    ]
+                },
+                "use-parent-test-session-in-tabs": {
+                    "description": "Tabs that resume the depends_on parent's signed-in session. Needs a depends_on.",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            }
+                        }
+                    ]
+                },
+                "use_parent_test_session_in_tabs": {
+                    "description": "Same as use-parent-test-session-in-tabs.",
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 255
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 255
+                            }
+                        }
+                    ]
+                },
+                "steps": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "items": {
+                        "$ref": "#/definitions/step"
+                    }
+                }
+            }
+        },
+        "step": {
+            "description": "One action, in plain English. A string, or a map with `step` and its assertions.",
+            "oneOf": [
+                {
+                    "type": "string",
+                    "minLength": 1
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "anyOf": [
+                        {
+                            "required": [
+                                "step"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
+                    ],
+                    "properties": {
+                        "step": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "Same as `step`."
+                        },
+                        "action": {
+                            "enum": [
+                                "goto",
+                                "reload",
+                                "fill",
+                                "type",
+                                "press",
+                                "click",
+                                "hover",
+                                "check",
+                                "uncheck",
+                                "select",
+                                "wait",
+                                "waitUntil",
+                                "dblclick",
+                                "rightClick",
+                                "clear",
+                                "focus",
+                                "blur",
+                                "setChecked",
+                                "selectText",
+                                "scrollIntoView",
+                                "scrollPage",
+                                "goBack",
+                                "goForward",
+                                "waitForURL",
+                                "waitForLoadState",
+                                "dragAndDrop",
+                                "uploadFile",
+                                "downloadFile"
+                            ],
+                            "description": "Optional pin. Leave it out unless the phrasing is ambiguous."
+                        },
+                        "value": {
+                            "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                            ],
+                            "description": "Optional pin."
+                        },
+                        "selector": {
+                            "type": "string",
+                            "description": "Optional pin. Discouraged: describe the element in the step instead."
+                        },
+                        "targetSelector": {
+                            "type": "string",
+                            "description": "Optional pin. Discouraged."
+                        },
+                        "pause_for_manual_action": {
+                            "type": "boolean",
+                            "description": "Pause after this step for a human: a TOTP code, a CAPTCHA, an approval elsewhere."
+                        },
+                        "tab": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "One of the test's declared tabs."
+                        },
+                        "assertions": {
+                            "type": "array",
+                            "maxItems": 20,
+                            "items": {
+                                "$ref": "#/definitions/assertion"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "assertion": {
+            "description": "One fact that is true after the step, in plain English. A string, or a map with `description`.",
+            "oneOf": [
+                {
+                    "type": "string",
+                    "minLength": 1
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "description"
+                    ],
+                    "properties": {
+                        "description": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "negate": {
+                            "type": "boolean",
+                            "description": "Assert the fact is not true."
+                        },
+                        "type": {
+                            "enum": [
+                                "status",
+                                "checkboxIsChecked",
+                                "elementIsDisabled",
+                                "elementIsEnabled",
+                                "elementIsFocused",
+                                "elementContainsText",
+                                "listHasExactNumberOfChildren",
+                                "elementMatchesText",
+                                "inputHasValue",
+                                "selectHasOptionsSelected",
+                                "pageHasTitle",
+                                "pageHasURL",
+                                "elementIsVisible",
+                                "elementIsHidden",
+                                "elementIsAttached",
+                                "elementIsEditable",
+                                "elementIsEmpty",
+                                "elementInViewport",
+                                "elementHasAttribute",
+                                "elementHasClass",
+                                "elementHasId",
+                                "elementHasCSS",
+                                "elementHasRole",
+                                "elementHasAccessibleName",
+                                "elementHasAccessibleDescription",
+                                "responseIsOk",
+                                "downloadStarted"
+                            ],
+                            "description": "Optional pin."
+                        },
+                        "expected": {
+                            "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                            ],
+                            "description": "Optional pin: the exact value to check for."
+                        },
+                        "attribute": {
+                            "type": "string",
+                            "description": "Required when type is elementHasAttribute or elementHasCSS."
+                        },
+                        "selector": {
+                            "type": "string",
+                            "description": "Optional pin. Discouraged."
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

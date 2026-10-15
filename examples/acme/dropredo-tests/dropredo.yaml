@@ -1,0 +1,11 @@
+version: 1
+
+applications:
+  acme:
+    description: Acme customer web app
+    environments:
+      prod:
+        variables:
+          base_uri: "https://acme.test"
+          user_email: "REPLACE_ME"
+          user_password: "REPLACE_ME"
