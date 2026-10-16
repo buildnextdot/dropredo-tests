@@ -94,6 +94,29 @@ curl -X POST "https://app.dropredo.com/api/v1/triggers/$DROPREDO_TRIGGER_ID/run"
 
 The response has the run's `execution_id` and a `report_url`: a public page with each test's steps, result and video, which you can post on a pull request.
 
+To wait for the result, poll the run's status with the same token, every 15 seconds or so:
+
+```sh
+curl "https://app.dropredo.com/api/v1/executions/$DROPREDO_EXECUTION_ID" \
+  -H "Authorization: Bearer $DROPREDO_API_TOKEN"
+```
+
+```json
+{
+  "success": {
+    "execution_id": "…",
+    "status": "failed",
+    "finished": true,
+    "passed": false,
+    "counts": { "total": 12, "passed": 11, "failed": 1, "running": 0 },
+    "report_url": "…",
+    "app_url": "…"
+  }
+}
+```
+
+`status` is one of `running`, `waiting for manual action`, `completed`, `failed` or `force stopped`. Stop polling once `finished` is true, and fail your build unless `passed` is true. A run `waiting for manual action` is paused for a person and will not finish on its own. The **GitHub Action Workflow** download on the **API** tab does all of this for you.
+
 ## License
 
 [MIT](LICENSE). Write, share and fork suites in this format freely.
