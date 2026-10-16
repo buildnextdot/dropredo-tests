@@ -30,17 +30,42 @@ applications:
 | Path | What it is |
 |---|---|
 | [`PROMPT.md`](PROMPT.md) | The complete authoring prompt. Give it to an AI coding agent (Claude Code, Cursor, Copilot, Codex…) inside your repository, and it writes your `dropredo-tests/` folder. It is also the full reference for the format. |
+| [`.claude/skills/dropredo-tests/SKILL.md`](.claude/skills/dropredo-tests/SKILL.md) | The same prompt as a Claude Code skill. |
+| [`.cursor/rules/dropredo-tests.mdc`](.cursor/rules/dropredo-tests.mdc) | The same prompt as a Cursor project rule. |
 | [`schema/dropredo-tests.schema.json`](schema/dropredo-tests.schema.json) | A JSON Schema for one file, for autocomplete and checking in your editor. |
 | [`limits.json`](limits.json) | The limits an import is held to. |
 | [`examples/`](examples) | Real suites. `dropredo-website` is the 7-file suite DropRedo runs against its own website; `acme` is the two-file example from the prompt. |
 
-`PROMPT.md`, the schema and `limits.json` are generated from the same code DropRedo imports with, so they never promise something the importer doesn't accept.
+`PROMPT.md`, the skill, the Cursor rule, the schema and `limits.json` are generated from the same code DropRedo imports with, so they never promise something the importer doesn't accept.
 
 ## Write a suite
 
 1. Open your application's repository in your coding agent.
 2. Paste [`PROMPT.md`](PROMPT.md) in as the task.
 3. The agent reads your routes, templates and existing tests, writes `dropredo-tests/`, and lists every `REPLACE_ME` value (test account credentials, for example) for you to fill in.
+
+### With Claude Code
+
+Install the skill once, then ask for the suite in your own words ("write DropRedo tests for this app", "add the checkout flow to dropredo-tests") or run `/dropredo-tests`.
+
+```sh
+# In your repository, for everyone who works on it:
+mkdir -p .claude/skills/dropredo-tests
+curl -fsSL https://raw.githubusercontent.com/buildnextdot/dropredo-tests/main/.claude/skills/dropredo-tests/SKILL.md \
+  -o .claude/skills/dropredo-tests/SKILL.md
+
+# Or for every repository on your machine: use ~/.claude/skills/dropredo-tests/ instead.
+```
+
+### With Cursor
+
+Add the rule to your repository. Cursor attaches it whenever a `dropredo-tests/` file is in play, and its agent picks it up when you ask for DropRedo tests.
+
+```sh
+mkdir -p .cursor/rules
+curl -fsSL https://raw.githubusercontent.com/buildnextdot/dropredo-tests/main/.cursor/rules/dropredo-tests.mdc \
+  -o .cursor/rules/dropredo-tests.mdc
+```
 
 You can also write the files by hand. The format is small:
 
